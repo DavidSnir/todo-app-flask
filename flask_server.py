@@ -39,11 +39,11 @@ def create_task():
 
 @app.route("/tasks/<task_id>",methods= ['GET','PATCH','DELETE'])
 def show_task_by_id(task_id):
-    if not(str(task_id).isdigit() and str(task_id).isascii()):
-        return jsonify({"error": "only numbers after /tasks"}), 400
+    if not(type(task_id) == str):
+        return jsonify({"error": "only string after /tasks"}), 400
     result_task: Task
     for task in Task_list:
-        if int(task_id) == task.id:
+        if task_id == task.id:
             result_task = task
     if not result_task:
         return jsonify({"error": "Not Found"}),404
@@ -63,5 +63,5 @@ def show_task_by_id(task_id):
         return jsonify({"status": "success"}),201
         
 
-
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
