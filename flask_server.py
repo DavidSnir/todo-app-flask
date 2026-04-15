@@ -26,7 +26,7 @@ def create_task():
         return jsonify({"error": str(e)}),400
     if not type(title) == str:
         return jsonify({"error": "title should be string"}), 400
-    elif title:
+    elif title and title:
         new_task = Task(title=title)
         Task_list.append(new_task)
         return jsonify({
