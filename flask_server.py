@@ -1,9 +1,18 @@
 from flask import Flask, jsonify, request
+from werkzeug.exceptions import NotFound, BadRequest, Conflict, UnprocessableEntity
 from hardcoded_task_list import Task_list
 from models import Task
 from utils import check_json_fields
 
 app = Flask(__name__)
+
+@app.errorhandler(BadRequest)
+def bad_request(e):
+    return jsonify({"error": str(e)}),400
+
+@app.errorhandler(NotFound)
+def bad_request(e):
+    return jsonify({"error": str(e)}),404
 
 @app.get("/tasks")
 def show_tasks():
@@ -17,39 +26,37 @@ def create_task():
     """### create task adds a task to the tasks list\n
     needs a task title from the user in this format
     `{"title": "choses title"}`, or leave empty, in that case the title would be the defult untitled title"""
+    
     data = request.get_json()
-    try:
-        title = data.get("title")
-        if title is None:
-            raise TypeError("Key should be title")
-    except TypeError as e:
-        return jsonify({"error": str(e)}),400
-    if not type(title) == str:
-        return jsonify({"error": "title should be string"}), 400
-    elif title and title:
+    if data == {}:
+        raise BadRequest("Body is empty")
+    title = data.get("title")
+    if title is None:
+        raise BadRequest("Key should be title")
+    if not isinstance(title,str):
+        raise BadRequest("title should be string")
+    elif title:
         new_task = Task(title=title)
         Task_list.append(new_task)
         return jsonify({
             "status": "created",
-            "title": title
+            "task": new_task.to_json()
         }),201
     else:
         new_task = Task()
         Task_list.append(new_task)
         return jsonify({
             "status": "created",
-            "title": "untitled"
+            "task": new_task.to_json()
         }),201
         
-        
-
 @app.route("/tasks/<task_id>",methods= ['GET','PATCH','DELETE'])
 def show_task_by_id(task_id):
     
     # check if task id entered correctly
     if not(type(task_id) == str):
-        return jsonify({"error": "only string after /tasks"}), 400
-    result_task: Task
+        raise BadRequest("only string after /tasks")
+    result_task: Task = None
     
     # searches fot the right task
     # TODO: change Task_list var to dict for faster searching
@@ -57,7 +64,7 @@ def show_task_by_id(task_id):
         if task_id == task.id:
             result_task = task
     if not result_task:
-        return jsonify({"error": "Not Found"}),404
+        raise NotFound("Task was not found")
     
     # diffrent actions depends on chosen method
     if request.method == 'GET':
@@ -67,13 +74,12 @@ def show_task_by_id(task_id):
         allowed_fileds: list[tuple[str, type]] = [('title',str), ('is_complete', bool)]
         data = request.get_json()
         
+        # check for existing body
+        if data == {}:
+            raise NotFound("recived empty body")
+        
         # checks for incorect fields and types
         is_fields_corect = check_json_fields(allowed_fileds=allowed_fileds,user_data=data)
-        if not is_fields_corect[0]:
-            return jsonify(is_fields_corect[1])
-        for key, value in data.items():
-            if not (key,type(value)) in allowed_fileds:
-                   return jsonify({"error": f"the key {key} and value {value} combination is not allowed "})
         
         # updating the task object
         for key, value in data.items():
