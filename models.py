@@ -14,3 +14,40 @@ class Task:
         }
     def _generate_id(self):
         return str(uuid.uuid4())
+    
+tasks_list: list[Task] =[
+    Task("Learn Flask"),
+    Task("Build App"),
+    Task("Test With Postman",is_complete=True)
+]
+
+def get_all_tasks() -> list[Task]:
+    """returns a list of the tasks list"""
+    global tasks_list
+    result: list = []
+    for task in tasks_list:
+        result.append(task.to_json())
+    return result
+
+def get_task_by_id(task_id: str) -> Task:
+    """return the task with same id as inputed if exists, if not return `None`"""
+    result_task: Task = None
+    
+    # searches fot the right task
+    # TODO: change tasks_list var to dict for faster searching
+    for task in tasks_list:
+        if task_id == task.id:
+            result_task = task
+    return result_task
+
+def edit_task(task: Task, user_data: dict) -> None:
+    """gets the task and a user data in dictionary
+    `{
+        "title": str,
+        "is_complete": bool
+    }`"""
+    for key, value in user_data.items():
+        setattr(task,key,value)
+
+def remove_task(task: Task) -> None:
+    tasks_list.remove(task)
