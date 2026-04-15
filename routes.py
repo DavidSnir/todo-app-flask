@@ -1,13 +1,13 @@
 from flask import jsonify, request, Blueprint
 from werkzeug.exceptions import NotFound, BadRequest
-from models import *
+import models
 from utils import check_json_fields
 
 tasks_bp = Blueprint("tasks",__name__)
 
 @tasks_bp.get("/tasks")
 def show_tasks():
-    result = get_all_tasks()
+    result = models.get_all_tasks()
     return jsonify(result)
 
 @tasks_bp.post("/tasks")
@@ -24,16 +24,16 @@ def create_task():
         raise BadRequest("Key should be title")
     if not isinstance(title,str):
         raise BadRequest("title should be string")
-    elif title:
-        new_task = Task(title=title)
-        tasks_list.append(new_task)
+    elif title == "":
+        new_task = models.create_task()
         return jsonify({
             "status": "created",
             "task": new_task.to_json()
         }),201
-    else:
-        new_task = Task()
-        tasks_list.append(new_task)
+    elif title[0] == " ":
+        raise BadRequest("first character cant be ' '")
+    elif title:
+        new_task = models.create_task(title)
         return jsonify({
             "status": "created",
             "task": new_task.to_json()
@@ -46,7 +46,7 @@ def show_task_by_id(task_id):
     if not(type(task_id) == str):
         raise BadRequest("only string after /tasks")
     
-    result_task = get_task_by_id(task_id=task_id)
+    result_task = models.get_task_by_id(task_id=task_id)
     
     if not result_task:
         raise NotFound("Task was not found")
@@ -68,14 +68,14 @@ def show_task_by_id(task_id):
         if not is_fields_corect[0]:
             raise BadRequest(is_fields_corect[1])
         # updating the task object
-        edit_task(task=result_task, user_data=data)
+        result_task = models.edit_task(task=result_task, user_data=data)
         return jsonify({
             "status": "success",
             "task": result_task.to_json()
             }),200
     
     elif request.method == 'DELETE':
-        tasks_list.remove(result_task)
+        models.tasks_list.remove(result_task)
         return jsonify({"status": "success"}),200
         
 

@@ -40,14 +40,27 @@ def get_task_by_id(task_id: str) -> Task:
             result_task = task
     return result_task
 
+def create_task(task_name: str= None, is_complete: bool= None) -> Task:
+    """get string name and status (optional) and adds the task to the task list. Returns the new_task cobject created"""
+    if not(task_name or is_complete):
+        new_task = Task()
+    elif not task_name:
+        new_task = Task(is_complete=is_complete)
+    elif not is_complete:
+        new_task = Task(task_name)
+        
+    tasks_list.append(new_task)
+    return new_task
+
 def edit_task(task: Task, user_data: dict) -> None:
     """gets the task and a user data in dictionary
     `{
         "title": str,
         "is_complete": bool
-    }`"""
+    }` edits the task and returns a refrence for it (task)"""
     for key, value in user_data.items():
         setattr(task,key,value)
+    return task
 
 def remove_task(task: Task) -> None:
     tasks_list.remove(task)

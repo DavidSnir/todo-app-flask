@@ -6,5 +6,5 @@ def check_json_fields(allowed_fileds: list[tuple[str, type]], user_data: dict) -
     
     for key, value in user_data.items():
         if not (key,type(value)) in allowed_fileds:
-            False, f"key: {key} don't match value: {value}"
-    return True
+            return False, f"key: {key} don't match value: {value}"
+    return True, "success"
