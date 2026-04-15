@@ -18,7 +18,12 @@ def create_task():
     needs a task title from the user in this format
     `{"title": "choses title"}`, or leave empty, in that case the title would be the defult untitled title"""
     data = request.get_json()
-    title = data.get("title")
+    try:
+        title = data.get("title")
+        if title is None:
+            raise TypeError("Key should be title")
+    except TypeError as e:
+        return jsonify({"error": str(e)}),400
     if not type(title) == str:
         return jsonify({"error": "title should be string"}), 400
     elif title:
@@ -40,10 +45,12 @@ def create_task():
 
 @app.route("/tasks/<task_id>",methods= ['GET','PATCH','DELETE'])
 def show_task_by_id(task_id):
+    
     # check if task id entered correctly
     if not(type(task_id) == str):
         return jsonify({"error": "only string after /tasks"}), 400
     result_task: Task
+    
     # searches fot the right task
     # TODO: change Task_list var to dict for faster searching
     for task in Task_list:
@@ -51,12 +58,15 @@ def show_task_by_id(task_id):
             result_task = task
     if not result_task:
         return jsonify({"error": "Not Found"}),404
+    
     # diffrent actions depends on chosen method
     if request.method == 'GET':
         return jsonify(result_task.to_json())
+    
     elif request.method == 'PATCH':
         allowed_fileds: list[tuple[str, type]] = [('title',str), ('is_complete', bool)]
         data = request.get_json()
+        
         # checks for incorect fields and types
         is_fields_corect = check_json_fields(allowed_fileds=allowed_fileds,user_data=data)
         if not is_fields_corect[0]:
@@ -64,9 +74,12 @@ def show_task_by_id(task_id):
         for key, value in data.items():
             if not (key,type(value)) in allowed_fileds:
                    return jsonify({"error": f"the key {key} and value {value} combination is not allowed "})
+        
+        # updating the task object
         for key, value in data.items():
             setattr(result_task,key,value)
         return jsonify(result_task.to_json()),200
+    
     elif request.method == 'DELETE':
         Task_list.remove(result_task)
         return jsonify({"status": "success"}),200
