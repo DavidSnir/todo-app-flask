@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from hardcoded_task_list import Task_list
 from models import Task
+from utils import check_json_fields
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ def show_tasks():
 def create_task():
     """### create task adds a task to the tasks list\n
     needs a task title from the user in this format
-    `{"tiitle": "choses title"}`, or leave empty, in that case the title would be the defult untitled title"""
+    `{"title": "choses title"}`, or leave empty, in that case the title would be the defult untitled title"""
     data = request.get_json()
     title = data.get("title")
     if not type(title) == str:
@@ -39,28 +40,36 @@ def create_task():
 
 @app.route("/tasks/<task_id>",methods= ['GET','PATCH','DELETE'])
 def show_task_by_id(task_id):
+    # check if task id entered correctly
     if not(type(task_id) == str):
         return jsonify({"error": "only string after /tasks"}), 400
     result_task: Task
+    # searches fot the right task
+    # TODO: change Task_list var to dict for faster searching
     for task in Task_list:
         if task_id == task.id:
             result_task = task
     if not result_task:
         return jsonify({"error": "Not Found"}),404
-    elif request.method == 'GET':
+    # diffrent actions depends on chosen method
+    if request.method == 'GET':
         return jsonify(result_task.to_json())
     elif request.method == 'PATCH':
-        allowed_fileds = ['title', 'is_complete']
+        allowed_fileds: list[tuple[str, type]] = [('title',str), ('is_complete', bool)]
         data = request.get_json()
-        for item in data.items():
-            if not item[0] in allowed_fileds:
-                   return jsonify({"error": "can only chnage title, is_complete"})
+        # checks for incorect fields and types
+        is_fields_corect = check_json_fields(allowed_fileds=allowed_fileds,user_data=data)
+        if not is_fields_corect[0]:
+            return jsonify(is_fields_corect[1])
+        for key, value in data.items():
+            if not (key,type(value)) in allowed_fileds:
+                   return jsonify({"error": f"the key {key} and value {value} combination is not allowed "})
         for key, value in data.items():
             setattr(result_task,key,value)
-        return jsonify(result_task.to_json()),201
+        return jsonify(result_task.to_json()),200
     elif request.method == 'DELETE':
         Task_list.remove(result_task)
-        return jsonify({"status": "success"}),201
+        return jsonify({"status": "success"}),200
         
 
 if __name__ == "__main__":
