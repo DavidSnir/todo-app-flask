@@ -1,10 +1,16 @@
 import uuid
 class Task:
+    
+    tasks_by_task_id_list: dict[uuid.UUID,list[Task]] = {}
+    tasks_id_by_by_parent_id_list:dict[uuid.UUID,list[uuid.UUID]] = {}
         
-    def __init__(self,title:str = "untitled",is_complete: bool = False):
-        self.id: str = self._generate_id()
+    def __init__(self,parent_id: uuid,title:str = "untitled",is_complete: bool = False):
+        self.parent_id: uuid.UUID = parent_id
+        self.task_id: uuid.UUID = self._generate_id()
         self.title: str = title
         self.is_complete: bool = is_complete
+        self._add_to_tasks_by_tasks_list()
+        self._add_to_tasks_by_parent_list()
         
     def to_json(self):
         return {
@@ -15,20 +21,36 @@ class Task:
     def _generate_id(self):
         return uuid.uuid4()
     
+    def _add_to_tasks_by_tasks_list(self):
+        Task.tasks_by_task_id_list[str(self.task_id)]
     
+    def _add_to_tasks_by_parent_list(self):
+        Task.tasks_id_by_by_parent_id_list
+    
+    def create_sub_task(self,title:str = None,is_complete: bool = None):
+        pass
+
 class Task_List:
     
-    task_lists: dict[str, Task_List] = {
-        
-    }
+    task_lists: dict[str, Task_List] = {}
     
     def __init__(self, name):
-        self.name = name
-        self.id = self._generate_id()
-        self.tasks: list[Task] = []
+        if self.is_e(name):
+            self.name: str = name
+            self.id: uuid = self._generate_id()
+            self.tasks: list[Task] = []
+            self._add_list(self)
+        else:
+            raise ValueError("user name already exists")
+            
+    def is_exist(name: str):
+        return name.lower() in Task_List.task_lists
     
     def _generate_id(self) -> uuid:
         return uuid.uuid4()
+    
+    
+    
     
 tasks_list: list[Task] =[
     Task("Learn Flask"),
