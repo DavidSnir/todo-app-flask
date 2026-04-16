@@ -4,13 +4,14 @@ class Task:
     tasks_by_task_id_list: dict[uuid.UUID,list[Task]] = {}
     tasks_id_by_by_parent_id_list:dict[uuid.UUID,list[uuid.UUID]] = {}
         
-    def __init__(self,parent_id: uuid,title:str = "untitled",is_complete: bool = False):
+    def __init__(self, title: str = "untitled", is_complete: bool = False, parent_id: uuid.UUID = None):
         self.parent_id: uuid.UUID = parent_id
         self.task_id: uuid.UUID = self._generate_id()
         self.title: str = title
         self.is_complete: bool = is_complete
         self._add_to_tasks_by_tasks_list()
-        self._add_to_tasks_by_parent_list()
+        if parent_id:
+            self._add_to_tasks_by_parent_list()
         
     def to_json(self):
         return {
@@ -18,17 +19,39 @@ class Task:
             "title": self.title,
             "is_complete": self.is_complete
         }
-    def _generate_id(self):
+    def _generate_id(self) -> None:
         return uuid.uuid4()
     
-    def _add_to_tasks_by_tasks_list(self):
+    def _add_to_tasks_by_tasks_list(self) -> None:
         Task.tasks_by_task_id_list[str(self.task_id)]
     
-    def _add_to_tasks_by_parent_list(self):
+    def _add_to_tasks_by_parent_list(self)-> None:
         Task.tasks_id_by_by_parent_id_list
     
-    def create_sub_task(self,title:str = None,is_complete: bool = None):
-        pass
+    def create_sub_task(self,title:str = None,is_complete: bool = None) -> Task:
+        new_task = Task(title=title,is_complete=is_complete,parent_id=self.task_id)
+        return new_task
+        
+    def is_sub_task_exist(self,task_id: uuid.UUID) -> bool:
+        sub_tasks_id_list: list[uuid.UUID] = self.tasks_id_by_by_parent_id_list[self.task_id]
+        for sub_task_id in sub_tasks_id_list:
+            if sub_task_id == task_id:
+                return True
+        return False
+    
+    @classmethod
+    def is_task_exist(task_id: uuid.UUID) -> bool:
+        return task_id in Task.tasks_by_task_id_list
+    
+    @classmethod
+    def get_class_by_id(task_id: uuid.UUID) -> Task:
+        if Task.is_task_exist(task_id):
+            return Task.tasks_by_task_id_list[task_id]
+        raise ValueError("Task does not exists")
+    
+    @classmethod
+    def get_all_tasks() -> list[Task]:
+        return list(Task.tasks_by_task_id_list.values())
 
 class Task_List:
     
