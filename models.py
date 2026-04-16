@@ -1,4 +1,6 @@
 import uuid
+from db import database
+
 class Task:
         
     def __init__(self,title:str = "untitled",is_complete: bool = False):
@@ -50,6 +52,7 @@ def create_task(task_name: str= None, is_complete: bool= None) -> Task:
         new_task = Task(task_name)
         
     tasks_list.append(new_task)
+    database.task.insert_one(new_task.to_json())
     return new_task
 
 def edit_task(task: Task, user_data: dict) -> None:
