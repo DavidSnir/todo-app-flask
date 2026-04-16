@@ -8,12 +8,27 @@ class Task:
         
     def to_json(self):
         return {
-            "task_id": self.id,
+            "task_id": str(self.id),
             "title": self.title,
             "is_complete": self.is_complete
         }
     def _generate_id(self):
-        return str(uuid.uuid4())
+        return uuid.uuid4()
+    
+    
+class Task_List:
+    
+    task_lists: dict[str, Task_List] = {
+        
+    }
+    
+    def __init__(self, name):
+        self.name = name
+        self.id = self._generate_id()
+        self.tasks: list[Task] = []
+    
+    def _generate_id(self) -> uuid:
+        return uuid.uuid4()
     
 tasks_list: list[Task] =[
     Task("Learn Flask"),
