@@ -1,13 +1,13 @@
 from flask import jsonify, request, Blueprint
 from werkzeug.exceptions import NotFound, BadRequest
-import models
+import models.task as task
 from utils import check_json_fields
 
 tasks_bp = Blueprint("tasks",__name__)
 
 @tasks_bp.get("/tasks")
 def show_tasks():
-    result = models.get_all_tasks()
+    result = task.get_all_tasks()
     return jsonify(result)
 
 @tasks_bp.post("/tasks")
@@ -25,7 +25,7 @@ def create_task():
     if not isinstance(title,str):
         raise BadRequest("title should be string")
     elif title == "":
-        new_task = models.create_task()
+        new_task = task.create_task()
         return jsonify({
             "status": "created",
             "task": new_task.to_json()
@@ -33,7 +33,7 @@ def create_task():
     elif title[0] == " ":
         raise BadRequest("first character cant be ' '")
     elif title:
-        new_task = models.create_task(title)
+        new_task = task.create_task(title)
         return jsonify({
             "status": "created",
             "task": new_task.to_json()
@@ -46,7 +46,7 @@ def show_task_by_id(task_id):
     if not(type(task_id) == str):
         raise BadRequest("only string after /tasks")
     
-    result_task = models.get_task_by_id(task_id=task_id)
+    result_task = task.get_task_by_id(task_id=task_id)
     
     if not result_task:
         raise NotFound("Task was not found")
@@ -68,14 +68,14 @@ def show_task_by_id(task_id):
         if not is_fields_corect[0]:
             raise BadRequest(is_fields_corect[1])
         # updating the task object
-        result_task = models.edit_task(task=result_task, user_data=data)
+        result_task = task.edit_task(task=result_task, user_data=data)
         return jsonify({
             "status": "success",
             "task": result_task.to_json()
             }),200
     
     elif request.method == 'DELETE':
-        models.tasks_list.remove(result_task)
+        task.tasks_list.remove(result_task)
         return jsonify({"status": "success"}),200
         
 

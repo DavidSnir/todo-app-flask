@@ -1,4 +1,4 @@
-from models import Task
+from src.models.task import Task
 Task1 = Task()
 Task2 = Task()
 Task3 = Task()

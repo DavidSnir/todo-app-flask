@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from routes import tasks_bp
+from routes.tasks import tasks_bp
 from errors import error_bp
 
 
