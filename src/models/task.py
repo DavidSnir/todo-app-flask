@@ -71,24 +71,4 @@ class Task:
     #             task.remove_task_and_sub_task()
     #     else:
     #         self.remove_task()
-        
-    
-# class Task_List:
-    
-#     task_lists: dict[str, Task_List] = {}
-    
-#     def __init__(self, name):
-#         if self.is_e(name):
-#             self.name: str = name
-#             self.id: uuid = self._generate_id()
-#             self.tasks: list[Task] = []
-#             self._add_list(self)
-#         else:
-#             raise ValueError("list name already exists")
-            
-#     def is_exist(name: str):
-#         return name.lower() in Task_List.task_lists
-    
-#     def _generate_id(self) -> uuid:
-#         return uuid.uuid4()
     
