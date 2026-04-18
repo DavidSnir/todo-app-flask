@@ -1,7 +1,7 @@
 from flask import jsonify, request, Blueprint
 from werkzeug.exceptions import NotFound, BadRequest
-import models.task as task
-from utils import check_json_fields
+import src.models.task as task
+from src.utils import check_json_fields
 
 tasks_bp = Blueprint("tasks",__name__)
 

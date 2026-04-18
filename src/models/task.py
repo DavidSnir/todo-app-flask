@@ -1,17 +1,20 @@
 import uuid
+
 class Task:
-    
-    tasks_by__id_list: dict[uuid.UUID,list[Task]] = {}
-    tasks_id_by_parent_id_list:dict[uuid.UUID,list[Task]] = {}
-        
-    def __init__(self, title: str = "untitled", is_complete: bool = False, parent_id: uuid.UUID = None):
+            
+    def __init__(self, title: str = "untitled", is_complete: bool = None,task_id: uuid.UUID = None ,parent_id: uuid.UUID = None):
         self.parent_id: uuid.UUID = parent_id
-        self._id: uuid.UUID = self._generate_id()
+        if not task_id:
+            self._id: uuid.UUID = self._generate_id()
+        else:
+            self._id: uuid.UUID = task_id
+
         self.title: str = title
-        self.is_complete: bool = is_complete
-        self._add_to_tasks_by_tasks_list()
-        if parent_id:
-            self._add_to_tasks_by_parent_list()
+        
+        if not is_complete:
+            self.is_complete: bool = False
+        else:
+            self.is_complete: bool = True
         
     def to_json(self):
         return {
@@ -23,24 +26,14 @@ class Task:
     def _generate_id(self) -> None:
         return uuid.uuid4()
     
-    def _add_to_tasks_by_tasks_list(self) -> None:
-        Task.tasks_by__id_list[self._id]
-    
-    def _add_to_tasks_by_parent_list(self)-> None:
-        Task.tasks_id_by_parent_id_list[self.parent_id].append(self._id)
-    
-    def create_sub_task(self,title:str = None,is_complete: bool = None) -> Task:
+    def create_sub_task(self,title:str = None,is_complete: bool = None):
         new_task = Task(title=title,is_complete=is_complete,parent_id=self._id)
         return new_task
         
     def is_sub_task_exist(self,_id: uuid.UUID) -> bool:
-        sub_tasks_id_list: list[uuid.UUID] = self.tasks_id_by_parent_id_list[self._id]
-        for sub__id in sub_tasks_id_list:
-            if sub__id == _id:
-                return True
-        return False
+        pass
     
-    def edit_task(self, user_data: dict) -> Task:
+    def edit_task(self, user_data: dict):
         """gets the task and a user data in dictionary
         `{
             "title": str,
@@ -50,42 +43,24 @@ class Task:
             setattr(self,key,value)
         return self
 
-    def remove_task(self) -> None:
-        """remove task if it doesnt have sub task"""
-        if not self._id in Task.tasks_id_by_parent_id_list:
-            Task.tasks_by__id_list.pop(self._id)
-        else:
-            raise ValueError("Task have subtasks, the remove_task_and_sub_task function is needed")
-
-    def remove_task_and_sub_task(self) -> None:
-        """remove task and it's sub tasks recursivly"""
-        sub_tasks_id = Task.tasks_id_by_parent_id_list[self._id]
-        if sub_tasks_id:
-            for _id in sub_tasks_id:
-                task: Task = Task.get_task_by_id(_id)
-                task.remove_task_and_sub_task()
-        else:
-            self.remove_task()
+    # def remove_task(self) -> None:
+    #     """remove task if it doesnt have sub task"""
+    #     # if not self._id in Task.tasks_id_by_parent_id_list:
+    #     #     Task.tasks_by__id_list.pop(self._id)
+    #     # else:
+    #     #     raise ValueError("Task have subtasks, the remove_task_and_sub_task function is needed")
+    #     pass
     
-    @classmethod
-    def is_task_exist(_id: uuid.UUID) -> bool:
-        return _id in Task.tasks_by__id_list
-    
-    @classmethod
-    def get_task_by_id(_id: uuid.UUID) -> Task:
-        if Task.is_task_exist(_id):
-            return Task.tasks_by__id_list[_id]
-        raise ValueError("Task does not exists")
-    
-    @classmethod
-    def get_all_tasks() -> list[Task]:
-        return list(Task.tasks_by__id_list.values())
-    
-    @classmethod
-    def create_task(task_name: str = None, is_complete: bool = None) -> Task:
-        new_task =Task(title=task_name,is_complete=is_complete)
-        return new_task
-    
+    # def remove_task_and_sub_task(self) -> None:
+    #     """remove task and it's sub tasks recursivly"""
+    #     sub_tasks_id = Task.tasks_id_by_parent_id_list[self._id]
+    #     if sub_tasks_id:
+    #         for _id in sub_tasks_id:
+    #             task: Task = Task.get_task_by_id(_id)
+    #             task.remove_task_and_sub_task()
+    #     else:
+    #         self.remove_task()
+        
     
 # class Task_List:
     
