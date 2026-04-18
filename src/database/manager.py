@@ -35,6 +35,7 @@ class TaskManager:
         return sub_task_list
 
     def add_task(self, task: Task)->bool:
+        """needs a task obj, return true if tasks was added, false if it didnt"""
         result = self.collection.insert_one(task.to_json())
         return result.acknowledged
         
@@ -46,6 +47,28 @@ class TaskManager:
         )
         return result
 
-    def remove_task(tas: Task):
+    def remove_task(self, task: Task)->tuple[bool,str]:
+        """if task does not exists returns true, if tasks have sub task use the remove_task_and_sub_tasks"""
+        if self.get_sub_tasks(task) == []:
+           result = self.collection.delete_one({"_id": str(task._id)})
+           return result.acknowledged, str(result.raw_result)
+        else:
+            return False, "Task have sub tasks"
         # TODO: update the tasks index of parents
-        pass
+        
+    def remove_task_and_sub_tasks(self, task: Task)->tuple[bool,int]:
+        """returns true and the number of removed tasks"""
+        sub_tasks = self.get_sub_tasks(task)
+        count = 0
+        if not sub_tasks == []:
+            for sub_task in sub_tasks:
+                result = self.remove_task_and_sub_tasks(sub_task)
+                count += result[1]
+            self.remove_task(task)
+            return True, count+len(sub_tasks)
+        else:
+            result = self.remove_task(task)
+            return result[0],0
+            
+            
+
