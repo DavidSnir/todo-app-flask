@@ -1,7 +1,27 @@
 import uuid
 
 class Task:
-            
+    
+    @classmethod
+    def from_dict(cls,task_dict: dict)->Task:
+        """Needs a dictionary contains:
+        ```\n{
+            \n\t"title": str,
+            \n\t"is_complete": bool,
+            \n\t"_id": str(UUID),
+            \n\t"parent_id": str(UUID) | None
+        \n}"""
+        try:
+            parent_id = uuid.UUID(task_dict["parent_id"])
+        except:
+            parent_id = None
+        return Task(
+            title=task_dict["title"],
+            is_complete=task_dict["is_complete"],
+            task_id=uuid.UUID(task_dict["_id"]),
+            parent_id=parent_id
+        )
+        
     def __init__(self, title: str = "untitled", is_complete: bool = None,task_id: uuid.UUID = None ,parent_id: uuid.UUID = None):
         self.parent_id: uuid.UUID = parent_id
         if not task_id:

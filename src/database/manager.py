@@ -14,50 +14,24 @@ class TaskManager:
 
     def get_all_tasks(self) -> list[Task]:
         tasks_json = list(self.collection.find())
-        tasks_obj: list[Task] = []
-        for task_json in tasks_json:
-            try:
-                parent_id = UUID(task_json["id"])
-            except:
-                parent_id = None
-            finally: 
-                tasks_obj.append(Task(
-                    title=task_json["title"],
-                    is_complete=task_json["is_complete"],
-                    task_id=UUID(task_json["_id"]),
-                    parent_id=parent_id
-                ))
-        return tasks_obj
+        tasks_list: list[Task] = []
+        
+        for task_dict in tasks_json:
+            tasks_list.append(Task.from_dict(task_dict))
+
+        return tasks_list
     
     def get_task_by_id(self, task_id: str)->Task:
-        task_json = self.collection.find_one(filter={"_id":task_id})
-        try:
-            parent_id = UUID(task_json["id"])
-        except:
-            parent_id = None
-        finally: 
-            return Task(
-                title=task_json["title"],
-                is_complete=task_json["is_complete"],
-                task_id=UUID(task_json["_id"]),
-                parent_id=parent_id
-            )
+        task_dict = self.collection.find_one(filter={"_id":task_id})
+        return Task.from_dict(task_dict)
 
     def get_sub_tasks(self, parent_task: Task)->list[Task]:
         sub_tasks_json = self.collection.find({"parent_id":str(parent_task._id)})
         sub_task_list: list[Task] = []
-        for task_json in sub_tasks_json:
-            try:
-                parent_id = UUID(task_json["id"])
-            except:
-                parent_id = None
-            finally: 
-                sub_task_list.append(Task(
-                    title=task_json["title"],
-                    is_complete=task_json["is_complete"],
-                    task_id=UUID(task_json["_id"]),
-                    parent_id=parent_id
-                ))
+        
+        for task_dict in sub_tasks_json:
+            sub_task_list.append(Task.from_dict(task_dict))
+            
         return sub_task_list
 
     def add_task(self, task: Task)->bool:

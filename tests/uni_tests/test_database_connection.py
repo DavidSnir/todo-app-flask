@@ -56,4 +56,5 @@ def test_edit_task():
 
     print("edit task done\n")
 
-def remove_task
+def remove_task():
+    pass
