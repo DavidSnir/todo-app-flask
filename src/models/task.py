@@ -22,19 +22,11 @@ class Task:
             parent_id=parent_id
         )
         
-    def __init__(self, title: str = "untitled", is_complete: bool = None,task_id: uuid.UUID = None ,parent_id: uuid.UUID = None):
-        self.parent_id: uuid.UUID = parent_id
-        if not task_id:
-            self._id: uuid.UUID = self._generate_id()
-        else:
-            self._id: uuid.UUID = task_id
-
+    def __init__(self, title: str = "untitled", is_complete: bool = False, task_id: uuid.UUID = None, parent_id: uuid.UUID = None):
+        self.parent_id: uuid.UUID | None = parent_id
+        self._id: uuid.UUID = task_id if task_id else self._generate_id()
         self.title: str = title
-        
-        if not is_complete:
-            self.is_complete: bool = False
-        else:
-            self.is_complete: bool = True
+        self.is_complete: bool = is_complete
         
     def to_json(self):
         return {
@@ -43,24 +35,23 @@ class Task:
             "title": self.title,
             "is_complete": self.is_complete
         }
-    def _generate_id(self) -> None:
+        
+    def _generate_id(self) -> uuid.UUID:
         return uuid.uuid4()
     
-    def create_sub_task(self,title:str = None,is_complete: bool = None):
-        new_task = Task(title=title,is_complete=is_complete,parent_id=self._id)
+    def create_sub_task(self, title: str = None, is_complete: bool = False):
+        new_task = Task(title=title, is_complete=is_complete, parent_id=self._id)
         return new_task
         
-    def is_sub_task_exist(self,_id: uuid.UUID) -> bool:
-        pass
-    
     def edit_task(self, user_data: dict):
-        """gets the task and a user data in dictionary
-        `{
+        """gets a dictionary of fields to update
+        {
             "title": str,
             "is_complete": bool
-        }` edits the task and returns a refrence for it (task)"""
+        } edits the task and returns self"""
         for key, value in user_data.items():
-            setattr(self,key,value)
+            if hasattr(self, key):
+                setattr(self, key, value)
         return self
 
     # def remove_task(self) -> None:

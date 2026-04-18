@@ -6,11 +6,11 @@ from src.database.manager import TaskManager
 from src.database.connection import database as db
 
 tasks_bp = Blueprint("tasks",__name__)
+global task_manager
 task_manager = TaskManager(db.tasks)
 
 @tasks_bp.get("/tasks")
 def show_tasks():
-    global task_manager
     all_tasks_list: list[Task]  = task_manager.get_all_tasks()
     result = [task.to_json() for task in all_tasks_list]
     return jsonify({"status": "success","tasks": result})
@@ -22,37 +22,31 @@ def create_task():
     
     data = request.get_json()
     
-    if data == {}:
+    if not data:
         raise BadRequest("Body is empty")
+        
     title = data.get("title")
     if title is None:
         raise BadRequest("Key should be title")
-    if not isinstance(title,str):
+    if not isinstance(title, str):
         raise BadRequest("title should be string")
-    elif title == "":
+    
+    title = title.strip()
+    if not title:
         new_task = Task()
-        task_manager.add_task(new_task)
-        return jsonify({
-            "status": "created",
-            "task": new_task.to_json()
-        }),201
-    elif title[0] == " ":
-        raise BadRequest("first character cant be ' '")
-    elif title:
+    else:
         new_task = Task(title)
-        task_manager.add_task(new_task)
+        
+    if task_manager.add_task(new_task):
         return jsonify({
             "status": "created",
             "task": new_task.to_json()
-        }),201
+        }), 201
+    else:
+        return jsonify({"status": "failed", "error": "Could not add task"}), 500
         
-@tasks_bp.route("/tasks/<task_id>",methods= ['GET','PATCH','DELETE'])
+@tasks_bp.route("/tasks/<task_id>", methods=['GET', 'PATCH', 'DELETE'])
 def ask_by_id(task_id):
-    
-    # check if task id entered correctly
-    if not(type(task_id) == str):
-        raise BadRequest("only string after /tasks")
-    
     result_task = task_manager.get_task_by_id(task_id)
     
     if not result_task:
@@ -63,31 +57,49 @@ def ask_by_id(task_id):
         return jsonify(result_task.to_json())
     
     elif request.method == 'PATCH':
-        allowed_fileds: list[tuple[str, type]] = [('title',str), ('is_complete', bool)]
+        allowed_fields: list[tuple[str, type]] = [('title', str), ('is_complete', bool)]
         data = request.get_json()
         
         # check for existing body
-        if data == {}:
-            raise NotFound("recived empty body")
+        if not data:
+            raise BadRequest("received empty body")
         
-        # checks for incorect fields and types
-        is_fields_corect = check_json_fields(allowed_fileds=allowed_fileds,user_data=data)
-        if not is_fields_corect[0]:
-            raise BadRequest(is_fields_corect[1])
-        elif data["title"]=="":
-            raise NotFound("title cant be empty")
-        elif data["title"][0] == " ":
-            raise NotFound("title cant begin with ' '")
+        # checks for incorrect fields and types
+        is_fields_correct = check_json_fields(allowed_fileds=allowed_fields, user_data=data)
+        if not is_fields_correct[0]:
+            raise BadRequest(is_fields_correct[1])
+        
+        if 'title' in data:
+            if not data["title"].strip():
+                raise BadRequest("title cannot be empty or only whitespace")
+            data["title"] = data["title"].strip()
+
         # updating the task object
         result_task.edit_task(user_data=data)
-        task_manager.edit_task(result_task)
+        success = task_manager.edit_task(result_task)
+        
         return jsonify({
-            "status": "success",
+            "status": "success" if success else "failed",
             "task": result_task.to_json()
-            }),200
+            }), 200
     
     elif request.method == 'DELETE':
-        task.tasks_list.remove(result_task)
-        return jsonify({"status": "success"}),200
+        success, message = task_manager.remove_task(result_task)
+        if success:
+            return jsonify({"status": "success"}), 200
+        else:
+            return jsonify({"status": "failed", "message": message}), 400
+
+@tasks_bp.delete("/tasks/<task_id>/r")
+def recursive_delete(task_id):
+    result_task = task_manager.get_task_by_id(task_id)
+    if not result_task:
+        raise NotFound("Task was not found")
+    
+    success, count = task_manager.remove_task_and_sub_tasks(result_task)
+    if success:
+        return jsonify({"status": "success", "deleted_count": count}), 200
+    else:
+        return jsonify({"status": "failed", "message": "Could not remove task and sub-tasks"}), 500
         
 

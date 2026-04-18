@@ -65,9 +65,10 @@ def test_remove_task():
         result: tuple = manager.remove_task(will_be_removed_task)
         assert result[0], result[1]
     
+    #remove none existense task
     result: tuple = manager.remove_task(will_be_removed_task)
     print(result[1])
-    assert result[0]
+    assert not result[0]
     
     a_sub_task = will_be_removed_task.create_sub_task("a sub task")
     if manager.add_task(will_be_removed_task):
@@ -84,9 +85,10 @@ def test_remove_task_and_sub_tasks():
         result: tuple = manager.remove_task_and_sub_tasks(will_be_removed_task)
         assert result[0], result[1]
     
+    #remove none existense task
     result: tuple = manager.remove_task_and_sub_tasks(will_be_removed_task)
     print(result[1])
-    assert result[0]
+    assert not result[0]
     
     for i in range(1,11):
         a_sub_task = will_be_removed_task.create_sub_task(f"a sub task {i}")
