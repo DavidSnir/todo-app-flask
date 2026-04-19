@@ -63,15 +63,16 @@ class TaskManager:
         """returns true and the number of removed tasks"""
         sub_tasks = self.get_sub_tasks(task)
         count = 0
-        if not sub_tasks == []:
-            for sub_task in sub_tasks:
-                result = self.remove_task_and_sub_tasks(sub_task)
-                count += result[1]
-            self.remove_task(task)
-            return True, count+len(sub_tasks)
-        else:
-            result = self.remove_task(task)
-            return result[0],0
+        for sub_task in sub_tasks:
+            success, sub_count = self.remove_task_and_sub_tasks(sub_task)
+            if success:
+                count += sub_count
+        
+        success, _ = self.remove_task(task)
+        if success:
+            count += 1
+            return True, count
+        return False, count
 
 class TaskListManager:
     def __init__(self, db_collection: Collection, task_manager: TaskManager = None):

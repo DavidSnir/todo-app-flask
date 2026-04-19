@@ -66,6 +66,5 @@ pytest tests/uni_tests/todo_test.py
 ## 🗺 Roadmap
 - [x] In-memory Todo API
 - [x] Error handling & Input validation
-- [ ] **MongoDB Integration** for persistent storage
-- [ ] Dockerization for DevOps workflows
-- [ ] CI/CD Pipeline setup
+- [x] **MongoDB Integration** for persistent storage
+- [x] Tests with pytest
