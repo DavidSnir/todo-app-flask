@@ -3,11 +3,12 @@ from werkzeug.exceptions import NotFound, BadRequest
 from src.models.task import Task
 from src.utils import check_json_fields
 from src.database.manager import TaskManager
-from src.database.connection import database as db
+from src.database.connection import get_collection
 
 tasks_bp = Blueprint("tasks",__name__)
 global task_manager
-task_manager = TaskManager(db.tasks)
+collection_name = "tasks"
+task_manager = TaskManager(get_collection(collection_name))
 
 @tasks_bp.get("/tasks")
 def show_tasks():

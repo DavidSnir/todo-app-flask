@@ -3,12 +3,13 @@ from werkzeug.exceptions import NotFound, BadRequest
 from src.models.task_list import TaskList
 from src.utils import check_json_fields
 from src.database.manager import TaskListManager, TaskManager
-from src.database.connection import database as db
+from src.database.connection import get_collection
 
 task_lists_bp = Blueprint("task_lists", __name__)
-
-task_manager = TaskManager(db.tasks)
-task_list_manager = TaskListManager(db.task_lists, task_manager=task_manager)
+tasks_collection_name = "tasks"
+task_list_collection_name = "task_lists"
+task_manager = TaskManager(get_collection(tasks_collection_name))
+task_list_manager = TaskListManager(get_collection(task_list_collection_name), task_manager=task_manager)
 
 @task_lists_bp.get("/lists")
 def show_lists():
@@ -17,7 +18,10 @@ def show_lists():
     return jsonify({"status": "success", "lists": result})
 
 @task_lists_bp.post("/lists")
+
 def create_list():
+    """needs a body {"title": name}"""
+    
     data = request.get_json()
     if not data:
         raise BadRequest("Body is empty")
