@@ -24,6 +24,10 @@ def test_get_task_by_id():
     new_task = Task("get task by id test")
     task_manager = TaskManager(db.tasks)
 
+    # give short id
+    get_task = task_manager.get_task_by_id("wrongId")
+    assert get_task is None
+    
     task_manager.add_task(new_task)
     get_task = task_manager.get_task_by_id(str(new_task._id))
     print(get_task.to_json())

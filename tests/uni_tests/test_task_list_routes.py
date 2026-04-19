@@ -26,6 +26,7 @@ def test_get_all_lists(client, test_list):
     assert any(lst['_id'] == test_list['_id'] for lst in data["lists"])
 
 def test_get_list_by_id(client, test_list):
+     
     response = client.get(f"/lists/{test_list['_id']}")
     assert response.status_code == 200
     data = response.get_json()
