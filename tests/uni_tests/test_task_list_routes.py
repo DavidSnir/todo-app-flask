@@ -1,6 +1,9 @@
 import pytest
 from src.app import create_app
 from src.models.task_list import TaskList
+from src.models.task import Task
+from src.database.connection import get_collection
+from src.database.manager import TaskManager
 import uuid
 
 @pytest.fixture(scope="module")
@@ -9,6 +12,12 @@ def client():
     app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
+
+@pytest.fixture
+def task_manager():
+    # Since create_app() is already called in client fixture (module scope),
+    # the database is already initialized.
+    return TaskManager(get_collection("tasks"))
 
 @pytest.fixture
 def test_list(client):
@@ -62,14 +71,12 @@ def test_edit_list(client, test_list):
     # Test empty title
     assert client.patch(f"/lists/{list_id}", json={"title": ""}).status_code == 400
 
-def test_delete_list(client):
+def test_delete_list(client, task_manager):
     # Create a list and a task inside it
     list_resp = client.post('/lists', json={"title": "Delete List Test"})
     list_id = list_resp.get_json()['list']['_id']
     
     # Manually add a task with this list_id as parent_id
-    from src.routes.tasks import task_manager
-    from src.models.task import Task
     task = Task(title="Task in list", parent_id=uuid.UUID(list_id))
     task_manager.add_task(task)
     task_id = str(task._id)
@@ -90,14 +97,12 @@ def test_delete_list(client):
     # Cleanup task
     client.delete(f"/tasks/{task_id}")
 
-def test_recursive_delete_list(client):
+def test_recursive_delete_list(client, task_manager):
     # Create a list
     list_resp = client.post('/lists', json={"title": "Recursive Delete List Test"})
     list_id = list_resp.get_json()['list']['_id']
     
     # Add a task and a sub-task
-    from src.routes.tasks import task_manager
-    from src.models.task import Task
     task = Task(title="Task in list", parent_id=uuid.UUID(list_id))
     task_manager.add_task(task)
     task_id = str(task._id)

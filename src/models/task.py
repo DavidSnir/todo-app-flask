@@ -3,7 +3,7 @@ import uuid
 class Task:
     
     @classmethod
-    def from_dict(cls,task_dict: dict)->Task:
+    def from_dict(cls,task_dict: dict) -> "Task":
         """Needs a dictionary contains:
         ```\n{
             \n\t"title": str,
@@ -15,7 +15,7 @@ class Task:
             parent_id = uuid.UUID(task_dict["parent_id"])
         except:
             parent_id = None
-        return Task(
+        return cls(
             title=task_dict["title"],
             is_complete=task_dict["is_complete"],
             task_id=uuid.UUID(task_dict["_id"]),

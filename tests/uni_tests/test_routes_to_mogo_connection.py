@@ -1,6 +1,8 @@
 import pytest
 from src.app import create_app
 from src.models.task import Task
+from src.database.connection import get_collection
+from src.database.manager import TaskManager
 
 @pytest.fixture(scope="module")
 def client():
@@ -8,6 +10,12 @@ def client():
     app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
+
+@pytest.fixture
+def task_manager():
+    # Since create_app() is already called in client fixture (module scope),
+    # the database is already initialized.
+    return TaskManager(get_collection("tasks"))
 
 @pytest.fixture
 def test_task(client):
@@ -83,11 +91,10 @@ def test_delete_task(client):
     get_response = client.get(f"/tasks/{task_id}")
     assert get_response.status_code == 404
 
-def test_recursive_delete(client):
+def test_recursive_delete(client, task_manager):
     parent_resp = client.post('/tasks', json={"title": "Parent Task"})
     parent_id = parent_resp.get_json()['task']['_id']
     
-    from src.routes.tasks import task_manager
     parent_task_obj = task_manager.get_task_by_id(parent_id)
     sub_task_obj = parent_task_obj.create_sub_task(title="Sub Task")
     task_manager.add_task(sub_task_obj)
@@ -103,4 +110,3 @@ def test_recursive_delete(client):
     
     assert client.get(f"/tasks/{parent_id}").status_code == 404
     assert client.get(f"/tasks/{sub_id}").status_code == 404
- 

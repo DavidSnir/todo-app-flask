@@ -7,7 +7,7 @@ from src.database.connection import get_collection
 
 task_lists_bp = Blueprint("task_lists", __name__)
 tasks_collection_name = "tasks"
-task_list_collection_name = "task_lists"
+task_list_collection_name = "lists"
 task_manager = TaskManager(get_collection(tasks_collection_name))
 task_list_manager = TaskListManager(get_collection(task_list_collection_name), task_manager=task_manager)
 
