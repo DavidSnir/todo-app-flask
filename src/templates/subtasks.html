@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subtasks - Todo App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="page-title">Subtasks</h1>
+    
+    <div style="margin-bottom: 20px;">
+        <a href="/" class="btn-back" style="text-decoration: none; color: #6366f1; font-weight: 600;">&larr; Go Back</a>
+    </div>
+
+    <ul id="task-list"></ul>
+
+    <p id="empty-msg" class="empty-msg hidden">This task don't have a sub task</p>
+    <p id="error-msg" class="error-msg hidden"></p>
+  </div>
+
+  <script>
+    const TASK_ID = "{{ task_id }}";
+  </script>
+  <script src="{{ url_for('static', filename='js/subtasks.js') }}"></script>
+</body>
+</html>

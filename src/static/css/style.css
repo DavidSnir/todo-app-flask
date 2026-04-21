@@ -160,6 +160,15 @@ h1 {
   background: #c7d2fe;
 }
 
+.btn-subtasks {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.btn-subtasks:hover {
+  background: #bbf7d0;
+}
+
 .btn-delete {
   background: #fee2e2;
   color: #dc2626;

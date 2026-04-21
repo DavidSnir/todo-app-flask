@@ -1,4 +1,4 @@
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, render_template
 from werkzeug.exceptions import NotFound, BadRequest
 from src.models.task import Task
 from src.utils import check_json_fields
@@ -9,6 +9,10 @@ tasks_bp = Blueprint("tasks",__name__)
 global task_manager
 collection_name = "tasks"
 task_manager = TaskManager(get_collection(collection_name))
+
+@tasks_bp.get("/tasks/<task_id>/subtasks_page")
+def subtasks_page(task_id):
+    return render_template("subtasks.html", task_id=task_id)
 
 @tasks_bp.get("/tasks")
 def show_tasks():

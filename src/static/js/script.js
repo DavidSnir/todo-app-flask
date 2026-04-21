@@ -14,9 +14,11 @@ function showError(msg) {
 
 function renderTasks(tasks) {
   taskList.innerHTML = "";
-  emptyMsg.classList.toggle("hidden", tasks.length > 0);
+  // Filter for top-level tasks (parent_id is "None")
+  const topLevelTasks = tasks.filter(task => !task.parent_id || task.parent_id === "None");
+  emptyMsg.classList.toggle("hidden", topLevelTasks.length > 0);
 
-  tasks.forEach(task => {
+  topLevelTasks.forEach(task => {
     const li = document.createElement("li");
     // Backend uses is_complete
     const isComplete = task.is_complete || task.completed;
@@ -29,6 +31,7 @@ function renderTasks(tasks) {
         <span class="title-text">${escapeHtml(task.title)}</span>
       </label>
       <div class="actions">
+        <button class="btn-subtasks" title="Subtasks">&#10148;</button>
         <button class="btn-edit" title="Edit">&#9998;</button>
         <button class="btn-delete" title="Delete">&#10005;</button>
       </div>
@@ -42,6 +45,11 @@ function renderTasks(tasks) {
 
     // Edit
     li.querySelector(".btn-edit").onclick = () => startEdit(li, task, task._id);
+
+    // Subtasks
+    li.querySelector(".btn-subtasks").onclick = () => {
+      window.location.href = `/tasks/${task._id}/subtasks_page`;
+    };
 
     taskList.appendChild(li);
   });
