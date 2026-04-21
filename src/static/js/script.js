@@ -5,11 +5,36 @@ const emptyMsg  = document.getElementById("empty-msg");
 const errorMsg  = document.getElementById("error-msg");
 const addForm   = document.getElementById("add-form");
 const newTitle  = document.getElementById("new-title");
+const deleteModal = document.getElementById("delete-modal");
+const modalConfirm = document.getElementById("modal-confirm");
+const modalCancel = document.getElementById("modal-cancel");
 
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.classList.remove("hidden");
   setTimeout(() => errorMsg.classList.add("hidden"), 4000);
+}
+
+function showDeleteModal() {
+  deleteModal.classList.add("show");
+  return new Promise((resolve) => {
+    const onConfirm = () => {
+      deleteModal.classList.remove("show");
+      cleanup();
+      resolve(true);
+    };
+    const onCancel = () => {
+      deleteModal.classList.remove("show");
+      cleanup();
+      resolve(false);
+    };
+    const cleanup = () => {
+      modalConfirm.removeEventListener("click", onConfirm);
+      modalCancel.removeEventListener("click", onCancel);
+    };
+    modalConfirm.addEventListener("click", onConfirm);
+    modalCancel.addEventListener("click", onCancel);
+  });
 }
 
 function renderTasks(tasks) {
@@ -97,10 +122,29 @@ async function toggleTask(id, is_complete) {
 }
 
 async function deleteTask(id) {
-  const res  = await fetch(`${API}/${id}`, { method: "DELETE" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to delete task");
-  loadTasks();
+  try {
+    const res  = await fetch(`${API}/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    
+    if (!res.ok) {
+      if (data.message === "Task have sub tasks") {
+        const confirmDelete = await showDeleteModal();
+        if (confirmDelete) {
+          const recursiveRes = await fetch(`${API}/${id}/r`, { method: "DELETE" });
+          const recursiveData = await recursiveRes.json();
+          if (!recursiveRes.ok) throw new Error(recursiveData.message || "Failed to delete task and sub-tasks");
+          loadTasks();
+          return;
+        } else {
+          return;
+        }
+      }
+      throw new Error(data.message || data.error || "Failed to delete task");
+    }
+    loadTasks();
+  } catch (e) {
+    showError(e.message);
+  }
 }
 
 async function saveEdit(id, newTitleValue, li) {

@@ -8,16 +8,39 @@
 </head>
 <body>
   <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <a href="/" class="btn-home" style="text-decoration: none; font-weight: 600; padding: 5px 10px; background: #e2e8f0; border-radius: 6px; color: #1a1a2e;">Home</a>
+        <a href="#" id="back-link" class="btn-back" style="text-decoration: none; color: #6366f1; font-weight: 600;">&larr; Go Back</a>
+    </div>
+
     <h1 id="page-title">Subtasks</h1>
     
-    <div style="margin-bottom: 20px;">
-        <a href="/" class="btn-back" style="text-decoration: none; color: #6366f1; font-weight: 600;">&larr; Go Back</a>
-    </div>
+    <form id="add-form">
+      <input
+        type="text"
+        id="new-title"
+        placeholder="Add sub task..."
+        autocomplete="off"
+        required
+      />
+      <button type="submit">Add</button>
+    </form>
 
     <ul id="task-list"></ul>
 
     <p id="empty-msg" class="empty-msg hidden">This task don't have a sub task</p>
     <p id="error-msg" class="error-msg hidden"></p>
+  </div>
+
+  <div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Confirm Deletion</h2>
+      <p>This task has sub-tasks. Deleting it will delete all sub-tasks. Do you want to proceed?</p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn-cancel">Cancel</button>
+        <button id="modal-confirm" class="btn-confirm-delete">Delete All</button>
+      </div>
+    </div>
   </div>
 
   <script>

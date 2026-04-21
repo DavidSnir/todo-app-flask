@@ -27,6 +27,17 @@
     <p id="error-msg" class="error-msg hidden"></p>
   </div>
 
+  <div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Confirm Deletion</h2>
+      <p>This task has sub-tasks. Deleting it will delete all sub-tasks. Do you want to proceed?</p>
+      <div class="modal-actions">
+        <button id="modal-cancel" class="btn-cancel">Cancel</button>
+        <button id="modal-confirm" class="btn-confirm-delete">Delete All</button>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

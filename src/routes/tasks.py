@@ -31,16 +31,26 @@ def create_task():
         raise BadRequest("Body is empty")
         
     title = data.get("title")
+    parent_id = data.get("parent_id")
+    
     if title is None:
         raise BadRequest("Key should be title")
     if not isinstance(title, str):
         raise BadRequest("title should be string")
     
+    import uuid
+    p_id = None
+    if parent_id and parent_id != "None":
+        try:
+            p_id = uuid.UUID(parent_id)
+        except ValueError:
+            raise BadRequest("Invalid parent_id format")
+
     title = title.strip()
     if not title:
-        new_task = Task()
+        new_task = Task(parent_id=p_id)
     else:
-        new_task = Task(title)
+        new_task = Task(title, parent_id=p_id)
         
     if task_manager.add_task(new_task):
         return jsonify({
