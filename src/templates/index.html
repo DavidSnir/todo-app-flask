@@ -10,6 +10,23 @@
   <div class="container">
     <h1>Todo List</h1>
 
+    <div class="lists-section">
+      <div class="lists-header">
+        <h3>My Lists</h3>
+        <button id="add-list-btn" class="btn-small" title="Add New List">+</button>
+      </div>
+      <ul id="list-tabs" class="list-tabs">
+        <li class="list-tab active" data-id="all">All Tasks</li>
+      </ul>
+      <form id="add-list-form" class="add-list-form hidden">
+        <input type="text" id="new-list-title" placeholder="List title..." required />
+        <button type="submit" id="save-list-btn">Save</button>
+        <button type="button" id="cancel-list-btn" class="btn-cancel">Cancel</button>
+      </form>
+    </div>
+
+    <div id="current-list-name" class="current-list-name">All Tasks</div>
+
     <form id="add-form">
       <input
         type="text"
@@ -24,6 +41,7 @@
     <ul id="task-list"></ul>
 
     <p id="empty-msg" class="empty-msg hidden">No tasks yet. Add one above!</p>
+    <p id="success-msg" class="success-msg hidden"></p>
     <p id="error-msg" class="error-msg hidden"></p>
   </div>
 
@@ -34,6 +52,18 @@
       <div class="modal-actions">
         <button id="modal-cancel" class="btn-cancel">Cancel</button>
         <button id="modal-confirm" class="btn-confirm-delete">Delete All</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-list-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Delete List</h2>
+      <p>How would you like to delete this list?</p>
+      <div class="modal-actions-vertical">
+        <button id="modal-list-move" class="btn-confirm">Delete List & Move Tasks to "All Tasks"</button>
+        <button id="modal-list-delete-all" class="btn-confirm-delete">Delete List & All Its Tasks</button>
+        <button id="modal-list-cancel" class="btn-cancel">Cancel</button>
       </div>
     </div>
   </div>

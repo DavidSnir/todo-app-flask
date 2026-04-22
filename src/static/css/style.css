@@ -32,6 +32,130 @@ h1 {
   letter-spacing: -0.5px;
 }
 
+/* Lists section */
+.lists-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.lists-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.lists-header h3 {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.list-tabs {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-tab {
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-tab:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.list-tab.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+}
+
+.btn-delete-list {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.btn-delete-list:hover {
+  opacity: 1;
+  color: #ef4444;
+}
+
+.list-tab.active .btn-delete-list:hover {
+  color: #fee2e2;
+}
+
+.add-list-form {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.add-list-form input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.add-list-form button {
+  padding: 6px 12px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: #e2e8f0;
+  color: #475569;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-small:hover {
+  background: #cbd5e1;
+}
+
+.current-list-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
 /* Add form */
 #add-form {
   display: flex;
@@ -202,6 +326,16 @@ h1 {
   margin-top: 16px;
 }
 
+.success-msg {
+  text-align: center;
+  color: #166534;
+  background: #dcfce7;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  margin-top: 16px;
+}
+
 /* Modal */
 .modal {
   position: fixed;
@@ -248,7 +382,13 @@ h1 {
   justify-content: center;
 }
 
-.modal-actions button {
+.modal-actions-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-actions button, .modal-actions-vertical button {
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -256,6 +396,15 @@ h1 {
   cursor: pointer;
   border: none;
   transition: all 0.2s;
+}
+
+.btn-confirm {
+  background: #6366f1;
+  color: #fff;
+}
+
+.btn-confirm:hover {
+  background: #4f46e5;
 }
 
 .btn-cancel {
