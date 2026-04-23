@@ -1,23 +1,40 @@
 # Flask Todo App
 
-A simple and robust RESTful API for a Todo application, built with Flask. This project is part of a DevOps course, focusing on clean architecture, modular code (Blueprints), and API development.
+A full-stack Todo application built with Flask, featuring a web interface and a robust RESTful API. This project is part of a DevOps course, emphasizing clean architecture, modularity (Blueprints), and persistent storage with MongoDB.
 
-## Current Status
-Currently, the application uses **in-memory storage** for tasks. Integration with **MongoDB** is planned for the next phase.
+## Features
+- **Task Management:** Create, update, delete, and view tasks.
+- **Task Lists:** Organize tasks into different lists.
+- **Subtasks:** Support for hierarchical task management.
+- **Web Interface:** Interactive UI built with HTML, CSS, and JavaScript.
+- **Persistent Storage:** MongoDB integration for data persistence.
+- **Validation:** Robust JSON field validation for API requests.
+- **Error Handling:** Centralized error management via Flask Blueprints.
 
 ## Tech Stack
 - **Backend:** Flask (Python)
-- **Validation:** Custom utility for JSON field validation
-- **Error Handling:** Centralized error management via Flask Blueprints
-- **Storage:** In-memory (Transitioning to MongoDB soon)
+- **Database:** MongoDB (via PyMongo)
+- **Frontend:** HTML, Vanilla CSS, JavaScript
+- **Testing:** Pytest
+- **Environment:** Python-dotenv for configuration
 
 ## Project Structure
-- `app.py`: Application entry point.
-- `routes.py`: Contains API endpoints for task management.
-- `models.py`: Data structures and logic for task operations.
-- `errors.py`: Error handler Blueprint.
-- `utils.py`: Helper functions for validation.
-- `tests/`: Unit and end-to-end tests.
+The project follows a modular structure within the `src/` directory:
+- `app.py`: Application factory and entry point.
+- `database/`: Database connection and management logic.
+  - `connection.py`: MongoDB client initialization.
+  - `manager.py`: Data access objects (DAOs) for Tasks and Lists.
+- `models/`: Data structures and business logic.
+  - `task.py`: Task model and JSON serialization.
+  - `task_list.py`: Task List model.
+- `routes/`: API and UI route definitions (Blueprints).
+  - `tasks.py`: Endpoints for individual tasks and subtasks.
+  - `task_lists.py`: Endpoints for managing task lists.
+  - `errors.py`: Custom error handlers.
+- `static/`: Frontend assets (CSS and JS).
+- `templates/`: HTML templates for the web interface.
+- `utils.py`: Shared helper functions for validation.
+- `tests/`: Comprehensive unit and end-to-end tests.
 
 ## Installation & Setup
 
@@ -35,12 +52,18 @@ Currently, the application uses **in-memory storage** for tasks. Integration wit
 
 3. **Install dependencies:**
    ```bash
-   pip install -r requirments.txt
+   pip install -r requirements.txt
    ```
 
-4. **Run the application:**
+4. **Environment Configuration:**
+   Create a `.env` file in the root directory and add your MongoDB connection string:
+   ```env
+   MONGO_CONNECTION_STRING=mongodb://localhost:27017/
+   ```
+
+5. **Run the application:**
    ```bash
-   python app.py
+   python -m src.app
    ```
    The app will be available at `http://127.0.0.1:5000`.
 
@@ -49,22 +72,38 @@ Currently, the application uses **in-memory storage** for tasks. Integration wit
 ### Tasks
 - `GET /tasks`: Retrieve all tasks.
 - `POST /tasks`: Create a new task.
-  - Body: `{"title": "Task title"}`
+  - Body: `{"title": "Task title", "parent_id": "optional_id"}`
 - `GET /tasks/<task_id>`: Get a specific task by ID.
-- `PATCH /tasks/<task_id>`: Update a task's title or completion status.
+- `PATCH /tasks/<task_id>`: Update a task's title or status.
   - Body: `{"title": "New title", "is_complete": true}`
 - `DELETE /tasks/<task_id>`: Remove a task.
+- `DELETE /tasks/<task_id>/r`: Recursively delete a task and its subtasks.
+
+### Task Lists
+- `GET /lists`: Retrieve all task lists.
+- `POST /lists`: Create a new list.
+  - Body: `{"title": "List Name"}`
+- `GET /lists/<list_id>`: Get a specific list by ID.
+- `PATCH /lists/<list_id>`: Update list title.
+- `DELETE /lists/<list_id>`: Remove a list.
 
 ## Testing
-The project includes tests located in the `tests/` directory.
-To run tests (assuming you have `pytest` or a similar runner installed):
+The project includes unit and end-to-end tests.
+To run all tests:
 ```bash
-# Example command
-pytest tests/uni_tests/todo_test.py
+pytest
+```
+To run specific tests:
+```bash
+pytest tests/uni_tests/test_task_list_routes.py
 ```
 
 ## 🗺 Roadmap
 - [x] In-memory Todo API
 - [x] Error handling & Input validation
-- [x] **MongoDB Integration** for persistent storage
-- [x] Tests with pytest
+- [x] MongoDB Integration for persistent storage
+- [x] Web Interface (HTML/JS)
+- [x] Subtask support
+- [x] Unit and E2E Tests
+- [ ] Dockerization for containerized deployment
+- [ ] CI/CD Pipeline integration
